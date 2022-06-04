@@ -27,7 +27,7 @@ class RegistrationController extends Controller
                     "name" => $request->name,
                     "email" => $request->email,
                     "sex" => $request->sex,
-                    "role_id" => 2,
+                    "is_admin" => true,
                     "password" => Hash::make($request->password)
                 ]);
     

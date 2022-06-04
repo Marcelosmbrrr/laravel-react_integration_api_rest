@@ -47,4 +47,26 @@ class AuthController extends Controller
         }
 
     }
+
+    /**
+     * Logout.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function logout(Request $request) : \Illuminate\Http\Response 
+    {
+        try{
+
+            $request->user()->tokens()->delete();
+
+            return response(["message" => "Logout successfully!"], 200);
+
+        }catch(\Exception $e){
+
+            return response(["error" => $e->getMessage()], 500);
+
+        }
+
+    }
 }
