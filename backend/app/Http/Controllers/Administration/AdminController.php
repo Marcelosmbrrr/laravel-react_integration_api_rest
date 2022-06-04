@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Modules;
+namespace App\Http\Controllers\Administration;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Users\UserModel;
 
-class ClientModuleController extends Controller
+class AdminController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +15,7 @@ class ClientModuleController extends Controller
      */
     public function index()
     {
-        //
+        return UserModel::all();
     }
 
     /**
@@ -25,7 +26,7 @@ class ClientModuleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return UserModel::create($request->only(["name", "email", "sex", "role_id", "password"]));
     }
 
     /**
@@ -36,7 +37,7 @@ class ClientModuleController extends Controller
      */
     public function show($id)
     {
-        //
+        return UserModel::findOrFail($id);
     }
 
     /**
@@ -48,7 +49,7 @@ class ClientModuleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        return UserModel::where("id", $id)->update($request->only(["name", "email", "sex", "role_id", "password"]));
     }
 
     /**
@@ -59,6 +60,6 @@ class ClientModuleController extends Controller
      */
     public function destroy($id)
     {
-        //
+        return UserModel::where("id", $id)->delete();
     }
 }

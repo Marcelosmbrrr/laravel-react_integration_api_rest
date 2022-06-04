@@ -16,15 +16,30 @@ class LoginFormRequest extends FormRequest
         return false;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, mixed>
-     */
-    public function rules()
+   /**
+    * Get the validation rules that apply to the request.
+    *
+    * @return array
+    */
+    public function rules() : array
     {
         return [
-            //
+                'email' => 'bail|required|email',
+                'password' => 'bail|required'
+            ];  
+    }
+
+    /**
+    * Get the error messages for the defined validation rules.
+    *
+    * @return array
+    */
+    public function messages() : array
+    {
+        return [
+            'email.required' => 'O email precisa ser informado',
+            'email.email' => 'Digite um endereço de e-mail válido',
+            'password.required' => 'A senha precisa ser informada'
         ];
     }
 }
