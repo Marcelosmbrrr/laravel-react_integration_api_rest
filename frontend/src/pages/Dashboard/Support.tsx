@@ -1,14 +1,14 @@
 import * as React from 'react';
 
-export function Profile({...props}){
+export function Support({...props}) {
 
     React.useEffect(() => {
-        props.setPage("Profile");
+        props.setPage("Support");
     });
 
     return (
         <>
-            <h1>PROFILE</h1>
+            <h1>SUPPORT</h1>
         </>
     )
 }

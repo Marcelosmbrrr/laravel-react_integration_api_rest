@@ -11,7 +11,7 @@ export function Router() {
                 <Route path="/" element={<Login />} />
                 <Route path="register" element={<Register />} />
                 <Route path="forgot-password" element={<ForgotPassword />} />
-                <Route path="dashboard" element={<Layout />} />
+                <Route path="/lvreact/*" element={<Layout />} />
             </Routes>
         </>
 
