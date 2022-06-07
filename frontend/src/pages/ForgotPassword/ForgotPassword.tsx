@@ -38,18 +38,18 @@ export function ForgotPassword() {
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    Sign up
+                    Recover Account
                 </Typography>
                 <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TextField
                                 autoComplete="given-name"
-                                name="firstName"
+                                name="email"
                                 required
                                 fullWidth
-                                id="firstName"
-                                label="First Name"
+                                id="email"
+                                label="Email Address"
                                 autoFocus
                                 InputProps={{
                                     endAdornment:
@@ -63,21 +63,32 @@ export function ForgotPassword() {
                             <TextField
                                 required
                                 fullWidth
-                                id="email"
-                                label="Email Address"
-                                name="email"
-                                autoComplete="email"
+                                id="code"
+                                label="Code"
+                                name="code"
+                                disabled={true}
                             />
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
                                 required
                                 fullWidth
-                                name="password"
-                                label="Password"
+                                name="new_password"
+                                label="New Password"
                                 type="password"
-                                id="password"
-                                autoComplete="new-password"
+                                id="new_password"
+                                disabled={true}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                required
+                                fullWidth
+                                name="new_password_confirmation"
+                                label="New Password Confirmation"
+                                type="password"
+                                id="new_password_confirmation"
+                                disabled={true}
                             />
                         </Grid>
                     </Grid>
@@ -86,8 +97,9 @@ export function ForgotPassword() {
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
+                        disabled={true}
                     >
-                        Sign Up
+                        Change Password
                     </Button>
                     <Grid container justifyContent="flex-end">
                         <Grid item>
