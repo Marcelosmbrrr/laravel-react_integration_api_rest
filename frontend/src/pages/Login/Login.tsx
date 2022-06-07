@@ -11,16 +11,72 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 // Router
 import { Link } from "react-router-dom";
+// Axios
+import axios from 'axios';
+// Custom
+import { FormValidation } from '../../services/FormValidation';
 
-export function Login() {
+export interface fieldError {
+    email: boolean;
+    password: boolean;
+}
+
+export interface fieldErrorMessage {
+    email: string;
+    password: string;
+}
+
+export const Login = React.memo(() => {
+
+    const [fieldError, setFieldError] = React.useState<fieldError>({ email: false, password: false });
+    const [fieldErrorMessage, setFieldErrorMessage] = React.useState<fieldErrorMessage>({ email: "", password: "" });
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
-    };
+
+        const formData: FormData = new FormData(event.currentTarget);
+
+        if (formularyDataValidate(formData)) {
+
+            serverRequestExecution(formData);
+
+        }
+    }
+
+    const formularyDataValidate = (formData: FormData) => {
+
+        const emailValidation = FormValidation(formData.get("email"), null, null, null, null);
+        const passwordValidation = FormValidation(formData.get("password"), null, null, null, null);
+
+        setFieldError({ email: emailValidation.error, password: passwordValidation.error });
+        setFieldErrorMessage({ email: emailValidation.message, password: passwordValidation.message });
+
+        if (emailValidation.error || passwordValidation.error) {
+
+            return false;
+
+        } else {
+
+            return true;
+
+        }
+
+    }
+
+    const serverRequestExecution = (formData: FormData) => {
+
+        axios.post('/api/login', formData)
+            .then(function (response) {
+
+                // handle success
+                console.log(response);
+            })
+            .catch(function (error) {
+
+                // handle error
+                console.log(error);
+            })
+    }
 
     return (
         <Container component="main" maxWidth="xs">
@@ -48,6 +104,8 @@ export function Login() {
                         name="email"
                         autoComplete="email"
                         autoFocus
+                        error={fieldError.email}
+                        helperText={fieldErrorMessage.email}
                     />
                     <TextField
                         margin="normal"
@@ -57,7 +115,8 @@ export function Login() {
                         label="Password"
                         type="password"
                         id="password"
-                        autoComplete="current-password"
+                        error={fieldError.password}
+                        helperText={fieldErrorMessage.password}
                     />
                     <FormControlLabel
                         control={<Checkbox value="remember" color="primary" />}
@@ -87,4 +146,4 @@ export function Login() {
             </Box>
         </Container>
     );
-}
+});
