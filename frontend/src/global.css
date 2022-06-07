@@ -1,0 +1,15 @@
+body{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto';
+}
+
+a, ul, li{
+  text-decoration: 'none';
+  list-style: 'none';
+}
+
+a, img{
+  display: 'block';
+}
