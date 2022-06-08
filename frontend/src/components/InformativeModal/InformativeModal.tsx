@@ -12,6 +12,7 @@ import { Box } from '@mui/system';
 // Images
 import SuccessImage from "../../assets/images/Success/Success_md.png";
 import ErrorImage from "../../assets/images/Error/Error_md.png";
+import { Typography } from '@mui/material';
 
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & {
@@ -48,8 +49,7 @@ export const InformativeModal = React.memo((props: Props) => {
                 onClose={handleClose}
                 aria-describedby="alert-dialog-slide-description"
             >
-                <DialogTitle>{"Use Google's location service?"}</DialogTitle>
-                <DialogContent>
+                <DialogContent sx={{ padding: '50px 130px 50px 130px' }}>
 
                     <Box sx={{ margin: "auto", mb: 3, width: "max-content" }} justifyContent="center" >
                         {
@@ -58,7 +58,7 @@ export const InformativeModal = React.memo((props: Props) => {
                     </Box>
 
                     <DialogContentText id="alert-dialog-slide-description">
-                        {props.content.text}
+                        <Typography sx={{ fontSize: '20px' }}>{props.content.text}</Typography>
                     </DialogContentText>
 
                 </DialogContent>

@@ -9,49 +9,39 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-// Router
+// Libs
 import { Link } from "react-router-dom";
-// Axios
 import axios from 'axios';
 // Custom
 import { FormValidation } from '../../services/FormValidation';
-
-export interface fieldError {
-    email: boolean;
-    password: boolean;
-}
-
-export interface fieldErrorMessage {
-    email: string;
-    password: string;
-}
-
-export interface Validation {
-    error: boolean,
-    message: string
-}
+// Types
+import { Response } from '../../common/types';
+import { FieldError } from '../../common/types';
+import { FieldErrorMessage } from '../../common/types';
+import { Validation } from '../../common/types';
+import { FormData } from '../../common/types';
 
 export const Login = React.memo(() => {
 
-    const [fieldError, setFieldError] = React.useState<fieldError>({ email: false, password: false });
-    const [fieldErrorMessage, setFieldErrorMessage] = React.useState<fieldErrorMessage>({ email: "", password: "" });
+    const [formData, setFormData] = React.useState<FormData>({ email: null, password: null });
+    const [fieldError, setFieldError] = React.useState<FieldError>({ email: false, password: false });
+    const [fieldErrorMessage, setFieldErrorMessage] = React.useState<FieldErrorMessage>({ email: "", password: "" });
+    const [serverResponse, setServerResponse] = React.useState<Response>({ status: false, error: false, message: "" });
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        const formData: FormData = new FormData(event.currentTarget);
+        if (formularyDataValidate()) {
 
-        if (formularyDataValidate(formData)) {
-
-            serverRequestExecution(formData);
+            serverRequestExecution();
 
         }
     }
 
-    const formularyDataValidate = (formData: FormData) => {
+    const formularyDataValidate = () => {
 
-        const emailValidation : Validation = FormValidation(formData.get("email"), null, null, null, null);
-        const passwordValidation : Validation = FormValidation(formData.get("password"), null, null, null, null);
+        const emailValidation: Validation = FormValidation(formData.email, null, null, null, null);
+        const passwordValidation: Validation = FormValidation(formData.password, null, null, null, null);
 
         setFieldError({ email: emailValidation.error, password: passwordValidation.error });
         setFieldErrorMessage({ email: emailValidation.message, password: passwordValidation.message });
@@ -68,9 +58,9 @@ export const Login = React.memo(() => {
 
     }
 
-    const serverRequestExecution = (formData: FormData) => {
+    const serverRequestExecution = () => {
 
-        axios.post('/api/login', formData)
+        axios.post('http://127.0.0.1:8000/api/login', formData)
             .then(function (response) {
 
                 console.log(response);

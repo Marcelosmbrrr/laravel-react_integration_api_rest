@@ -14,53 +14,24 @@ import Axios from 'axios';
 import { RadioForm } from '../../components/RadioGroup/RadioForm';
 import { FormValidation } from "../../services/FormValidation";
 import { InformativeModal } from "../../components/InformativeModal/InformativeModal";
+// Types
+import { Response } from '../../common/types';
+import { FieldError } from '../../common/types';
+import { FieldErrorMessage } from '../../common/types';
+import { Validation } from '../../common/types';
+import { FormData } from '../../common/types';
 
 const radio_options: { value: string, label: string }[] = [
     { value: "m", label: "Male" },
     { value: "f", label: "Female" }
 ];
 
-export interface Validation {
-    error: boolean,
-    message: string
-}
-
-export interface FieldError {
-    name: boolean,
-    sex: boolean,
-    email: boolean,
-    password: boolean,
-    password_confirmation: boolean
-}
-
-export interface FieldErrorMessage {
-    name: string,
-    sex: string,
-    email: string,
-    password: string,
-    password_confirmation: string
-}
-
-export interface ResponseState {
-    status: boolean,
-    error: boolean,
-    message: string
-}
-
-export interface FormData {
-    name: String | null,
-    sex: String | null,
-    email: String | null,
-    password: String | null,
-    password_confirmation: String | null
-}
-
 export const Register = React.memo(() => {
 
     const [formData, setFormData] = React.useState<FormData>({ name: null, sex: null, email: null, password: null, password_confirmation: null });
     const [fieldError, setFieldError] = React.useState<FieldError>({ name: false, sex: false, email: false, password: false, password_confirmation: false });
     const [fieldErrorMessage, setFieldErrorMessage] = React.useState<FieldErrorMessage>({ name: "", sex: "", email: "", password: "", password_confirmation: "" });
-    const [response, setResponse] = React.useState<ResponseState>({ status: false, error: false, message: "" });
+    const [serverResponse, setServerResponse] = React.useState<Response>({ status: false, error: false, message: "" });
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         setFormData({ ...formData, [event.target.name]: event.currentTarget.value })
@@ -98,17 +69,15 @@ export const Register = React.memo(() => {
 
     const serverRequestExecution = (): void => {
 
-        console.log(formData)
-
-        Axios.post('/api/register', formData)
+        Axios.post('http://127.0.0.1/api/register', formData)
             .then(function (response) {
 
-                setResponse({ status: true, error: false, message: response.data.message });
+                setServerResponse({ status: true, error: false, message: response.data.message });
 
             })
             .catch(function (error) {
 
-                setResponse({ status: true, error: true, message: error.response.message });
+                setServerResponse({ status: true, error: true, message: "Registration Failed" });
 
             })
 
@@ -188,8 +157,8 @@ export const Register = React.memo(() => {
                         </Grid>
                     </Grid>
 
-                    {response.status &&
-                        <InformativeModal content={{ text: response.message, error: response.error }} />
+                    {serverResponse.status &&
+                        <InformativeModal content={{ text: serverResponse.message, error: serverResponse.error }} />
                     }
 
                     <Button

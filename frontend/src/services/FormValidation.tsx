@@ -3,7 +3,7 @@ export interface Return {
     message: string
 }
 
-export function FormValidation(value: any, min_length: Number | null, max_length: Number | null, regex: RegExp | null, field_name: String | null): Return {
+export function FormValidation(value: any, min_length: number | null, max_length: number | null, regex: RegExp | null, field_name: string | null): Return {
 
     if (nullCheck(value)) {
 
@@ -47,18 +47,18 @@ export function FormValidation(value: any, min_length: Number | null, max_length
 
 }
 
-const nullCheck = (value: any): Boolean => {
+const nullCheck = (value: any): boolean => {
     return value != null ? true : false;
 }
 
-const regexCheck = (value: any, regex: RegExp): Boolean => {
+const regexCheck = (value: any, regex: RegExp): boolean => {
     return value.match(regex) ? true : false;
 }
 
-const minLengthCheck = (value: any, min_length: Number): Boolean => {
+const minLengthCheck = (value: any, min_length: number): boolean => {
     return value.length >= min_length ? true : false;
 }
 
-const maxLengthCheck = (value: any, max_length: Number): Boolean => {
+const maxLengthCheck = (value: any, max_length: number): boolean => {
     return value.length <= max_length ? true : false;
 }
