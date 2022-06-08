@@ -12,7 +12,8 @@ import { Link } from "react-router-dom";
 import Axios from 'axios';
 // Custom
 import { RadioForm } from '../../components/RadioGroup/RadioForm';
-import { FormValidation } from '../../services/FormValidation';
+import { FormValidation } from "../../services/FormValidation";
+import { InformativeModal } from "../../components/InformativeModal/InformativeModal";
 
 const radio_options: { value: string, label: string }[] = [
     { value: "m", label: "Male" },
@@ -24,52 +25,70 @@ export interface Validation {
     message: string
 }
 
-export interface fieldError {
+export interface FieldError {
     name: boolean,
-    gender: boolean,
+    sex: boolean,
     email: boolean,
     password: boolean,
     password_confirmation: boolean
 }
 
-export interface fieldErrorMessage {
+export interface FieldErrorMessage {
     name: string,
-    gender: string,
+    sex: string,
     email: string,
     password: string,
     password_confirmation: string
 }
 
+export interface ResponseState {
+    status: boolean,
+    error: boolean,
+    message: string
+}
+
+export interface FormData {
+    name: String | null,
+    sex: String | null,
+    email: String | null,
+    password: String | null,
+    password_confirmation: String | null
+}
+
 export const Register = React.memo(() => {
 
-    const [fieldError, setFieldError] = React.useState<fieldError>({ name: false, gender: false, email: false, password: false, password_confirmation: false });
-    const [fieldErrorMessage, setFieldErrorMessage] = React.useState<fieldErrorMessage>({ name: "", gender: "", email: "", password: "", password_confirmation: "" });
+    const [formData, setFormData] = React.useState<FormData>({ name: null, sex: null, email: null, password: null, password_confirmation: null });
+    const [fieldError, setFieldError] = React.useState<FieldError>({ name: false, sex: false, email: false, password: false, password_confirmation: false });
+    const [fieldErrorMessage, setFieldErrorMessage] = React.useState<FieldErrorMessage>({ name: "", sex: "", email: "", password: "", password_confirmation: "" });
+    const [response, setResponse] = React.useState<ResponseState>({ status: false, error: false, message: "" });
+
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        setFormData({ ...formData, [event.target.name]: event.currentTarget.value })
+    }
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        const formData = new FormData(event.currentTarget);
+        if (formularyDataValidate()) {
 
-        if (formularyDataValidate(formData)) {
-
-            serverRequestExecution(formData);
+            serverRequestExecution();
 
         }
 
     };
 
-    const formularyDataValidate = (formData: FormData): Boolean => {
+    const formularyDataValidate = (): Boolean => {
 
-        const nameValidation: Validation = FormValidation(formData.get("name"), 3, null, null, "name");
-        const genderValidation: Validation = FormValidation(formData.get("sex"), 3, null, null, "gender");
-        const emailValidation: Validation = FormValidation(formData.get("email"), 3, null, null, "email");
-        const passwordValidation: Validation = FormValidation(formData.get("password"), 3, null, null, "password");
-        const passwordConfirmationValidation: Validation = formData.get("password") === formData.get("password_confirmation") ? { error: false, message: "" } : { error: true, message: "The passwords do not match" }
+        const nameValidation: Validation = FormValidation(formData.name, 3, null, null, "name");
+        const sexValidation: Validation = FormValidation(formData.sex, null, null, null, "sex");
+        const emailValidation: Validation = FormValidation(formData.email, 3, null, null, "email");
+        const passwordValidation: Validation = FormValidation(formData.password, 5, null, null, "password");
+        const passwordConfirmationValidation: Validation = formData.password === formData.password_confirmation ? { error: false, message: "" } : { error: true, message: "The passwords do not match" }
 
-        setFieldError({ name: nameValidation.error, gender: genderValidation.error, email: emailValidation.error, password: passwordValidation.error, password_confirmation: passwordConfirmationValidation.error });
-        setFieldErrorMessage({ name: nameValidation.message, gender: genderValidation.message, email: emailValidation.message, password: passwordValidation.message, password_confirmation: passwordConfirmationValidation.message });
+        setFieldError({ name: nameValidation.error, sex: sexValidation.error, email: emailValidation.error, password: passwordValidation.error, password_confirmation: passwordConfirmationValidation.error });
+        setFieldErrorMessage({ name: nameValidation.message, sex: sexValidation.message, email: emailValidation.message, password: passwordValidation.message, password_confirmation: passwordConfirmationValidation.message });
 
-        if (nameValidation.error || genderValidation.error || emailValidation.error || passwordValidation.error || passwordConfirmationValidation.error) {
+        if (nameValidation.error || sexValidation.error || emailValidation.error || passwordValidation.error || passwordConfirmationValidation.error) {
             return false;
         } else {
             return true;
@@ -77,16 +96,20 @@ export const Register = React.memo(() => {
 
     }
 
-    const serverRequestExecution = (formData: FormData): void => {
+    const serverRequestExecution = (): void => {
+
+        console.log(formData)
 
         Axios.post('/api/register', formData)
             .then(function (response) {
 
-                console.log(response);
+                setResponse({ status: true, error: false, message: response.data.message });
+
             })
             .catch(function (error) {
 
-                console.log(error);
+                setResponse({ status: true, error: true, message: error.response.message });
+
             })
 
     }
@@ -112,17 +135,18 @@ export const Register = React.memo(() => {
                         <Grid item xs={12} sm={12}>
                             <TextField
                                 autoComplete="given-name"
-                                name="firstName"
+                                name="name"
                                 required
                                 fullWidth
-                                id="firstName"
-                                label="First Name"
+                                id="name"
+                                label="Name"
                                 error={fieldError.name}
                                 helperText={fieldErrorMessage.name}
+                                onChange={handleInputChange}
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <RadioForm name={"sex"} options={radio_options} row={true} />
+                            <RadioForm event={handleInputChange} name={"sex"} options={radio_options} row={true} />
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
@@ -133,6 +157,7 @@ export const Register = React.memo(() => {
                                 name="email"
                                 error={fieldError.email}
                                 helperText={fieldErrorMessage.email}
+                                onChange={handleInputChange}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -145,6 +170,7 @@ export const Register = React.memo(() => {
                                 id="password"
                                 error={fieldError.password}
                                 helperText={fieldErrorMessage.password}
+                                onChange={handleInputChange}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -157,9 +183,15 @@ export const Register = React.memo(() => {
                                 id="password"
                                 error={fieldError.password_confirmation}
                                 helperText={fieldErrorMessage.password_confirmation}
+                                onChange={handleInputChange}
                             />
                         </Grid>
                     </Grid>
+
+                    {response.status &&
+                        <InformativeModal content={{ text: response.message, error: response.error }} />
+                    }
+
                     <Button
                         type="submit"
                         fullWidth
