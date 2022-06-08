@@ -9,20 +9,121 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import EmailIcon from '@mui/icons-material/Email';
 import IconButton from '@mui/material/IconButton';
-// Router
+// Libs
+import Axios from 'axios';
 import { Link } from "react-router-dom";
+// Custom 
+import { FormValidation } from '../../services/FormValidation';
 
+export interface Validation {
+    error: boolean,
+    message: string
+}
 
-export function ForgotPassword() {
+export interface fieldError {
+    email: boolean,
+    code: boolean,
+    new_password: boolean,
+    new_password_confirmation: boolean
+}
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+export interface fieldErrorMessage {
+    email: string,
+    code: string,
+    new_password: string,
+    new_password_confirmation: string
+}
+
+export const ForgotPassword = React.memo(() => {
+
+    const [fieldError, setFieldError] = React.useState<fieldError>({ email: false, code: false, new_password: false, new_password_confirmation: false });
+    const [fieldErrorMessage, setFieldErrorMessage] = React.useState<fieldErrorMessage>({ email: "", code: "", new_password: "", new_password_confirmation: "" });
+
+    const handleSubmitEmail = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
-    };
+
+        const formData = new FormData(event.currentTarget);
+
+        if (formularyEmailValidate(formData)) {
+
+            getCodeServerRequestExecution(formData);
+
+        }
+    }
+
+    const handleSubmitUpdate = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        const formData = new FormData(event.currentTarget);
+
+        if (formularyUpdatePasswordValidate(formData)) {
+
+            updatePasswordServerRequestExecution(formData);
+
+        }
+    }
+
+    const formularyEmailValidate = (formData: FormData): Boolean => {
+
+        const emailPattern = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+
+        const emailValidation: Validation = FormValidation(formData.get("email"), null, null, emailPattern, "email");
+
+        setFieldError({ code: false, email: false, new_password: false, new_password_confirmation: false });
+        setFieldErrorMessage({ code: "", email: "", new_password: "", new_password_confirmation: "" });
+
+        if (emailValidation.error) {
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
+    const formularyUpdatePasswordValidate = (formData: FormData): Boolean => {
+
+        const codeValidation: Validation = FormValidation(formData.get("code"), 5, 5, null, "code");
+        const newPasswordValidation: Validation = FormValidation(formData.get("new_password"), 3, null, null, "new password");
+        const newPasswordConfirmationValidation: Validation = formData.get("new_password") === formData.get("new_password_confirmation") ? { error: false, message: "" } : { error: true, message: "The passwords do not match" }
+
+        setFieldError({ code: codeValidation.error, email: false, new_password: newPasswordValidation.error, new_password_confirmation: newPasswordConfirmationValidation.error });
+        setFieldErrorMessage({ code: codeValidation.message, email: "", new_password: newPasswordValidation.message, new_password_confirmation: newPasswordConfirmationValidation.message });
+
+        if (codeValidation.error || newPasswordValidation.error || newPasswordConfirmationValidation.error) {
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
+    const getCodeServerRequestExecution = (formData: FormData): void => {
+
+        Axios.post('/api/register', formData)
+            .then(function (response) {
+
+                console.log(response);
+            })
+            .catch(function (error) {
+
+                console.log(error);
+            })
+
+    }
+
+    const updatePasswordServerRequestExecution = (formData: FormData): void => {
+
+        Axios.post('/api/register', formData)
+            .then(function (response) {
+
+                console.log(response);
+            })
+            .catch(function (error) {
+
+                console.log(error);
+            })
+
+    }
 
     return (
         <Container component="main" maxWidth="xs">
@@ -40,7 +141,8 @@ export function ForgotPassword() {
                 <Typography component="h1" variant="h5">
                     Recover Account
                 </Typography>
-                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+
+                <Box component="form" noValidate onSubmit={handleSubmitEmail} sx={{ mt: 3 }}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TextField
@@ -59,6 +161,11 @@ export function ForgotPassword() {
                                 }}
                             />
                         </Grid>
+                    </Grid>
+                </Box>
+
+                <Box component="form" noValidate onSubmit={handleSubmitUpdate} sx={{ mt: 3 }}>
+                    <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TextField
                                 required
@@ -104,7 +211,7 @@ export function ForgotPassword() {
                     <Grid container justifyContent="flex-end">
                         <Grid item>
                             <Link to="/">
-                                Already have an account? Sign in
+                                <Typography>Already have an account? Sign in</Typography>
                             </Link>
                         </Grid>
                     </Grid>
@@ -112,4 +219,4 @@ export function ForgotPassword() {
             </Box>
         </Container>
     );
-}
+});

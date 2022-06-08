@@ -26,6 +26,11 @@ export interface fieldErrorMessage {
     password: string;
 }
 
+export interface Validation {
+    error: boolean,
+    message: string
+}
+
 export const Login = React.memo(() => {
 
     const [fieldError, setFieldError] = React.useState<fieldError>({ email: false, password: false });
@@ -45,8 +50,8 @@ export const Login = React.memo(() => {
 
     const formularyDataValidate = (formData: FormData) => {
 
-        const emailValidation = FormValidation(formData.get("email"), null, null, null, null);
-        const passwordValidation = FormValidation(formData.get("password"), null, null, null, null);
+        const emailValidation : Validation = FormValidation(formData.get("email"), null, null, null, null);
+        const passwordValidation : Validation = FormValidation(formData.get("password"), null, null, null, null);
 
         setFieldError({ email: emailValidation.error, password: passwordValidation.error });
         setFieldErrorMessage({ email: emailValidation.message, password: passwordValidation.message });
@@ -68,12 +73,10 @@ export const Login = React.memo(() => {
         axios.post('/api/login', formData)
             .then(function (response) {
 
-                // handle success
                 console.log(response);
             })
             .catch(function (error) {
 
-                // handle error
                 console.log(error);
             })
     }
@@ -133,12 +136,12 @@ export const Login = React.memo(() => {
                     <Grid container>
                         <Grid item xs>
                             <Link to="forgot-password">
-                                Forgot password?
+                                <Typography>Forgot password?</Typography>
                             </Link>
                         </Grid>
                         <Grid item>
                             <Link to="register">
-                                {"Don't have an account? Sign Up"}
+                                <Typography>Don't have an account? Sign Up</Typography>
                             </Link>
                         </Grid>
                     </Grid>
