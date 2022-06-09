@@ -1,11 +1,8 @@
 import * as React from 'react';
 // Material UI
-import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
 import { Box } from '@mui/system';
@@ -53,12 +50,12 @@ export const InformativeModal = React.memo((props: Props) => {
 
                     <Box sx={{ margin: "auto", mb: 3, width: "max-content" }} justifyContent="center" >
                         {
-                            props.content.error ? <img src={ErrorImage} width={100} /> : <img src={SuccessImage} width={100} />
+                            props.content.error ? <img src={ErrorImage} width={100} alt="Error" /> : <img src={SuccessImage} width={100} alt="Success" />
                         }
                     </Box>
 
-                    <DialogContentText id="alert-dialog-slide-description">
-                        <Typography sx={{ fontSize: '20px' }}>{props.content.text}</Typography>
+                    <DialogContentText id="alert-dialog-slide-description" sx={{ fontSize: '20px' }}>
+                        {props.content.text}
                     </DialogContentText>
 
                 </DialogContent>

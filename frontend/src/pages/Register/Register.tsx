@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 // Libs
 import { Link } from "react-router-dom";
-import Axios from 'axios';
+import { AxiosApi } from '../../services/AxiosApi';
 // Custom
 import { RadioForm } from '../../components/RadioGroup/RadioForm';
 import { FormValidation } from "../../services/FormValidation";
@@ -69,15 +69,19 @@ export const Register = React.memo(() => {
 
     const serverRequestExecution = (): void => {
 
-        Axios.post('http://127.0.0.1/api/register', formData)
+        AxiosApi.post('http://127.0.0.1:8000/api/register', formData, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
             .then(function (response) {
 
                 setServerResponse({ status: true, error: false, message: response.data.message });
 
             })
             .catch(function (error) {
-
-                setServerResponse({ status: true, error: true, message: "Registration Failed" });
+                
+                setServerResponse({ status: true, error: true, message: error.message });
 
             })
 
