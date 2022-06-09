@@ -23,6 +23,7 @@ class AuthController extends Controller
      */
     public function login(LoginFormRequest $request) : \Illuminate\Http\Response 
     {
+        dd("login");
      
         if($user = Auth::attempt($request->only(["email", "password"]))){
 
@@ -56,6 +57,8 @@ class AuthController extends Controller
      */
     public function logout(Request $request) : \Illuminate\Http\Response 
     {
+        dd("logout");
+
         try{
 
             $request->user()->tokens()->delete();

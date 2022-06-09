@@ -10,6 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 // Models
 use App\Models\Telephones\TelephoneModel;
 use App\Models\Roles\RoleModel;
+use App\Models\Tokens\TokenModel;
 
 class UserModel extends Authenticatable
 {
@@ -32,5 +33,12 @@ class UserModel extends Authenticatable
     */
     function role(){
         return $this->belongsTo(RoleModel::class, "role_id", "id");
+    }
+
+    /**
+    * Relationship with token table
+    */
+    function token(){
+        return $this->hasOne(TokenModel::class, "user_id", "id");
     }
 }

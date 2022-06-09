@@ -6,7 +6,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Administration\AdminController;
 use App\Http\Controllers\Authentication\AuthController;
 use App\Http\Controllers\Authentication\RegistrationController;
+use App\Http\Controllers\Authentication\ForgotPasswordController;
 use App\Http\Controllers\Users\ProfileController;
+
 
 Route::middleware(["auth:sanctum"])->group(function(){
     Route::apiResource('/lvreact/admin', AdminController::class);
@@ -16,3 +18,8 @@ Route::middleware(["auth:sanctum"])->group(function(){
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/register', [RegistrationController::class, 'register']);
+Route::post('/change-password-token', [ForgotPasswordController::class, 'getToken']);
+Route::post('/change-password', [ForgotPasswordController::class, 'changePassword']);
+    
+
+

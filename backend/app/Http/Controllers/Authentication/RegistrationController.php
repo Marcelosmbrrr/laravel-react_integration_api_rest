@@ -19,6 +19,9 @@ class RegistrationController extends Controller
      */
     public function register(RegistrationFormRequest $request) : \Illuminate\Http\Response 
     {
+
+        dd("register");
+
         try{
 
             DB::transaction(function () use ($request) {
@@ -27,7 +30,7 @@ class RegistrationController extends Controller
                     "name" => $request->name,
                     "email" => $request->email,
                     "sex" => $request->sex,
-                    "is_admin" => true,
+                    "is_admin" => false,
                     "password" => Hash::make($request->password)
                 ]);
     
