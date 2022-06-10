@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('tokens', function (Blueprint $table) {
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('user_id')->constrained('users')->unique();
             $table->string('token', 5)->unique();
         });
     }

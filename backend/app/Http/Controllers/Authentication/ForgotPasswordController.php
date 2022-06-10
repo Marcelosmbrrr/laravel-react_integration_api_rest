@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Users\UserModel;
 use App\Models\Tokens\TokenModel;
+use Illuminate\Support\Str;
+// Form Request
+use App\Http\Requests\Authentication\ChangePasswordByCodeRequest;
 
 class ForgotPasswordController extends Controller
 {
@@ -13,37 +16,40 @@ class ForgotPasswordController extends Controller
     /**
      * Get Token.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function getToken(Request $request) : \Illuminate\Http\Response {
 
-        dd("getToken");
+        $validated = $request->validate([
+            'email' => 'required|exists:users,email'
+        ]);
 
-        $user = UserModel::where('email', $request->email)->firstOrFail();
+        $user = UserModel::where('email', $request->email)->first();
 
-        // Checar se já existe um token
-        // Se existir, fazer updateOrCreate
+        $user->token()->updateOrCreate(["token" => Str::random(5)]);
+
         // Enviar email para o usuário com o Token
+
+        return response("", 200);
 
     }
 
     /**
      * Change Password.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \App\Http\Requests\Authentication\ChangePasswordByCodeRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function changePassword(Request $request) : \Illuminate\Http\Response {
-
-        dd("changePassword");
+    public function changePassword(ChangePasswordByCodeRequest $request) : \Illuminate\Http\Response {
 
         $token = TokenModel::firstOrFail($request->code);
 
-        $token->user()->update($request->only["new_password"]);
+        $token->user()->update(["password" => $request->new_password]);
 
-        // Checar se existe o token 
-        // Atualizar a senha do usuário vinculado ao token
+        // Enviar email para o usuário confirmando a alteração
+
+        return response("", 200);
 
     }
 }

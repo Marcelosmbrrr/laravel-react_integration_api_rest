@@ -4,16 +4,12 @@ namespace App\Http\Controllers\Authentication;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
 // Models
 use App\Models\Users\UserModel;
 // Form Request
 use App\Http\Requests\Authentication\LoginFormRequest;
 
-class AuthController extends Controller
+class LoginController extends Controller
 {
     /**
      * Login.
@@ -44,30 +40,6 @@ class AuthController extends Controller
         }else{
 
             return response(["message" => "Email ou senha incorretos!"], 401);
-
-        }
-
-    }
-
-    /**
-     * Logout.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function logout(Request $request) : \Illuminate\Http\Response 
-    {
-        dd("logout");
-
-        try{
-
-            $request->user()->tokens()->delete();
-
-            return response(["message" => "Logout successfully!"], 200);
-
-        }catch(\Exception $e){
-
-            return response(["error" => $e->getMessage()], 500);
 
         }
 

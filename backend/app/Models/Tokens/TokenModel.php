@@ -12,7 +12,8 @@ class TokenModel extends Model
     use HasFactory;
 
     public $table = "tokens";
-    protected $timestamps = false;
+    public $timestamps = false;
+    protected $fillable = ["*"];
 
     /**
     * Relationship with user table
