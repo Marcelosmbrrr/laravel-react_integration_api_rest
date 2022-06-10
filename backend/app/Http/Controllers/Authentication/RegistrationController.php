@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Authentication;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 // Models
 use App\Models\Users\UserModel;
 // Form Request
@@ -19,8 +21,6 @@ class RegistrationController extends Controller
      */
     public function register(RegistrationFormRequest $request) : \Illuminate\Http\Response 
     {
-
-        dd("register");
 
         try{
 
