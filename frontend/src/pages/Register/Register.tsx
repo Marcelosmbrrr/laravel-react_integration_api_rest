@@ -15,13 +15,12 @@ import { RadioForm } from '../../components/RadioGroup/RadioForm';
 import { FormValidation } from "../../services/FormValidation";
 import { InformativeModal } from "../../components/InformativeModal/InformativeModal";
 // Types
-import { Response } from '../../common/types';
+import { RequestStatus } from '../../common/types';
 import { FieldError } from '../../common/types';
 import { FieldErrorMessage } from '../../common/types';
-import { Validation } from '../../common/types';
+import { InputValidation } from '../../common/types';
 import { FormData } from '../../common/types';
 import { ServerValidationErrors } from '../../common/types';
-import { ResponseErrors } from '../../common/types';
 import { AxiosError } from 'axios';
 
 const radio_options: { value: string, label: string }[] = [
@@ -31,10 +30,10 @@ const radio_options: { value: string, label: string }[] = [
 
 export const Register = React.memo(() => {
 
-    const [formData, setFormData] = React.useState<FormData>({ name: null, sex: null, email: null, password: null, password_confirmation: null });
+    const [formData, setFormData] = React.useState<FormData>({ name: "", sex: "", email: "", password: "", password_confirmation: "" });
     const [fieldError, setFieldError] = React.useState<FieldError>({ name: false, sex: false, email: false, password: false, password_confirmation: false });
     const [fieldErrorMessage, setFieldErrorMessage] = React.useState<FieldErrorMessage>({ name: "", sex: "", email: "", password: "", password_confirmation: "" });
-    const [serverResponse, setServerResponse] = React.useState<Response>({ status: false, error: false, message: "" });
+    const [serverResponse, setServerResponse] = React.useState<RequestStatus>({ status: false, error: false, message: "" });
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         setFormData({ ...formData, [event.target.name]: event.currentTarget.value })
@@ -53,11 +52,11 @@ export const Register = React.memo(() => {
 
     const formularyDataValidate = (): Boolean => {
 
-        const nameValidation: Validation = FormValidation(formData.name, 3, null, null, "name");
-        const sexValidation: Validation = FormValidation(formData.sex, null, null, null, "sex");
-        const emailValidation: Validation = FormValidation(formData.email, 3, null, null, "email");
-        const passwordValidation: Validation = FormValidation(formData.password, 5, null, null, "password");
-        const passwordConfirmationValidation: Validation = formData.password === formData.password_confirmation ? { error: false, message: "" } : { error: true, message: "The passwords do not match" }
+        const nameValidation: InputValidation = FormValidation(formData.name, 3, null, null, "name");
+        const sexValidation: InputValidation = FormValidation(formData.sex, null, null, null, "sex");
+        const emailValidation: InputValidation = FormValidation(formData.email, 3, null, null, "email");
+        const passwordValidation: InputValidation = FormValidation(formData.password, 5, null, null, "password");
+        const passwordConfirmationValidation: InputValidation = formData.password === formData.password_confirmation ? { error: false, message: "" } : { error: true, message: "The passwords do not match" }
 
         setFieldError({ name: nameValidation.error, sex: sexValidation.error, email: emailValidation.error, password: passwordValidation.error, password_confirmation: passwordConfirmationValidation.error });
         setFieldErrorMessage({ name: nameValidation.message, sex: sexValidation.message, email: emailValidation.message, password: passwordValidation.message, password_confirmation: passwordConfirmationValidation.message });
