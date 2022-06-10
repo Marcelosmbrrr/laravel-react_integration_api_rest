@@ -21,3 +21,11 @@ export interface Response {
     message: string
 }
 
+export interface ResponseErrors {
+    error: boolean,
+    message: string 
+}
+
+export interface ServerValidationErrors {
+    [key: string]: ResponseErrors
+}

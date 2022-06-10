@@ -20,6 +20,9 @@ import { FieldError } from '../../common/types';
 import { FieldErrorMessage } from '../../common/types';
 import { Validation } from '../../common/types';
 import { FormData } from '../../common/types';
+import { ServerValidationErrors } from '../../common/types';
+import { ResponseErrors } from '../../common/types';
+import { AxiosError } from 'axios';
 
 const radio_options: { value: string, label: string }[] = [
     { value: "m", label: "Male" },
@@ -69,21 +72,70 @@ export const Register = React.memo(() => {
 
     const serverRequestExecution = (): void => {
 
-        AxiosApi.post('http://127.0.0.1:8000/api/register', formData, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
+        AxiosApi.post('http://127.0.0.1:8000/api/register', formData)
             .then(function (response) {
 
                 setServerResponse({ status: true, error: false, message: response.data.message });
 
-            })
-            .catch(function (error) {
-                
-                setServerResponse({ status: true, error: true, message: error.message });
+                setTimeout(() => {
+                    window.location.href = "http://localhost:3000/";
+                }, 3000);
 
             })
+            .catch(function (error) {
+
+                errorServerRequest(error);
+
+            })
+
+    }
+
+    const errorServerRequest = (error: any): void => {
+
+        setServerResponse({ status: true, error: true, message: error.message });
+
+        const error_data = error.response.data;
+
+        // Definição dos objetos de erro possíveis de serem retornados pelo validation do Laravel
+        let server_validation_args: ServerValidationErrors = {
+            name: { error: false, message: "" },
+            sex: { error: false, message: "" },
+            email: { error: false, message: "" },
+            password: { error: false, message: "" },
+            password_confirmation: { error: false, message: "" }
+        }
+
+        // Coleta dos objetos de erro existentes na response
+        for (let prop in error_data.errors) {
+
+            server_validation_args[prop] = {
+                error: true,
+                message: error_data.errors[prop][0]
+            }
+
+        }
+
+        setFieldError({
+            name: server_validation_args.name.error,
+            sex: server_validation_args.sex.error,
+            email: server_validation_args.email.error,
+            password: server_validation_args.password.error,
+            password_confirmation: server_validation_args.password_confirmation.error
+        });
+
+
+        setFieldErrorMessage({
+            name: server_validation_args.name.message,
+            sex: server_validation_args.sex.message,
+            email: server_validation_args.email.message,
+            password: server_validation_args.password.message,
+            password_confirmation: server_validation_args.password_confirmation.message
+        });
+
+        setTimeout(() => {
+            setServerResponse({ status: false, error: false, message: "" });
+        }, 3000);
+
 
     }
 
