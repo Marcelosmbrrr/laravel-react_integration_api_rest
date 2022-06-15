@@ -21,6 +21,8 @@ class ForgotPasswordController extends Controller
      */
     public function getToken(Request $request) : \Illuminate\Http\Response {
 
+        dd("get token");
+
         $validated = $request->validate([
             'email' => 'required|exists:users,email'
         ]);
@@ -42,6 +44,8 @@ class ForgotPasswordController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function changePassword(ChangePasswordByCodeRequest $request) : \Illuminate\Http\Response {
+
+        dd("change password");
 
         $token = TokenModel::firstOrFail($request->code);
 
