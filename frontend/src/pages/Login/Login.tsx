@@ -10,23 +10,29 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 // Libs
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
 // Custom
 import { FormValidation } from '../../services/FormValidation';
 // Types
-import { Response } from '../../common/types';
+import { RequestStatus } from '../../common/types';
 import { FieldError } from '../../common/types';
 import { FieldErrorMessage } from '../../common/types';
-import { Validation } from '../../common/types';
+import { InputValidation } from '../../common/types';
 import { FormData } from '../../common/types';
 
 export const Login = React.memo(() => {
 
+    const navigate = useNavigate();
+
     const [formData, setFormData] = React.useState<FormData>({ email: null, password: null });
     const [fieldError, setFieldError] = React.useState<FieldError>({ email: false, password: false });
     const [fieldErrorMessage, setFieldErrorMessage] = React.useState<FieldErrorMessage>({ email: "", password: "" });
-    const [serverResponse, setServerResponse] = React.useState<Response>({ status: false, error: false, message: "" });
+    const [serverResponse, setServerResponse] = React.useState<RequestStatus>({ status: false, error: false, message: "" });
+
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        setFormData({ ...formData, [event.target.name]: event.currentTarget.value });
+    }
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -40,8 +46,8 @@ export const Login = React.memo(() => {
 
     const formularyDataValidate = () => {
 
-        const emailValidation: Validation = FormValidation(formData.email, null, null, null, null);
-        const passwordValidation: Validation = FormValidation(formData.password, null, null, null, null);
+        const emailValidation: InputValidation = FormValidation(formData.email, null, null, null, null);
+        const passwordValidation: InputValidation = FormValidation(formData.password, null, null, null, null);
 
         setFieldError({ email: emailValidation.error, password: passwordValidation.error });
         setFieldErrorMessage({ email: emailValidation.message, password: passwordValidation.message });
@@ -63,11 +69,16 @@ export const Login = React.memo(() => {
         axios.post('http://127.0.0.1:8000/api/login', formData)
             .then(function (response) {
 
-                console.log(response);
+                localStorage.setItem("auth_token", response.data.token);
+                localStorage.setItem("auth_name", response.data.name);
+
+                navigate("/lvreact");
+
             })
             .catch(function (error) {
 
-                console.log(error);
+                navigate("/");
+
             })
     }
 
@@ -99,6 +110,7 @@ export const Login = React.memo(() => {
                         autoFocus
                         error={fieldError.email}
                         helperText={fieldErrorMessage.email}
+                        onChange={handleInputChange}
                     />
                     <TextField
                         margin="normal"
@@ -110,6 +122,7 @@ export const Login = React.memo(() => {
                         id="password"
                         error={fieldError.password}
                         helperText={fieldErrorMessage.password}
+                        onChange={handleInputChange}
                     />
                     <FormControlLabel
                         control={<Checkbox value="remember" color="primary" />}

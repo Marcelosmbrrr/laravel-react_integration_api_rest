@@ -35,6 +35,9 @@ export const Register = React.memo(() => {
     const [fieldErrorMessage, setFieldErrorMessage] = React.useState<FieldErrorMessage>({ name: "", sex: "", email: "", password: "", password_confirmation: "" });
     const [serverResponse, setServerResponse] = React.useState<RequestStatus>({ status: false, error: false, message: "" });
 
+    /*
+    *   Method for handle what is typed in the formulary.
+    */
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         setFormData({ ...formData, [event.target.name]: event.currentTarget.value })
     }
