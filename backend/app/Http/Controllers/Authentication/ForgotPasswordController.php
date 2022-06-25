@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Users\UserModel;
 use App\Models\Tokens\TokenModel;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 // Form Request
 use App\Http\Requests\Authentication\ChangePasswordByCodeRequest;
 

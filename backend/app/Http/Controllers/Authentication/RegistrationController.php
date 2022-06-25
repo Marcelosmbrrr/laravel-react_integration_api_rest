@@ -22,6 +22,8 @@ class RegistrationController extends Controller
     public function register(RegistrationFormRequest $request) : \Illuminate\Http\Response 
     {
 
+        dd("register");
+
         try{
 
             DB::transaction(function () use ($request) {

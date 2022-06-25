@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Authentication;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 // Models
 use App\Models\Users\UserModel;
 // Form Request
@@ -19,20 +21,19 @@ class LoginController extends Controller
      */
     public function login(LoginFormRequest $request) : \Illuminate\Http\Response 
     {
-        dd("login");
      
-        if($user = Auth::attempt($request->only(["email", "password"]))){
+        if(Auth::attempt($request->only(["email", "password"]))){
 
-            if(!empty(Auth::user()->email_confirmed_at)){
-                return response(["message" => "O email precisa ser confirmado!"], 401);
-            }
+            $user = UserModel::findOrFail(Auth::user()->id);
 
-             // The sanctum token is created with a value that will be hashed
-            $sanctum_token = $user->createToken(Str::random(10), ["isAdmin" => Auth::user()->isAdmin])->plainTextToken;
+            // The sanctum token is created with a value that will be hashed
+            $role = Auth::user()->isAdmin ? "admin" : "user";
+            $sanctum_token = $user->createToken(Str::random(10), ["role" => $role])->plainTextToken;
 
             return response(
                 ["message" => "Acesso autorizado!", 
-                "user" => UserModel::find(Auth::user()->id),
+                "user" => Auth::user()->id,
+                "isAdmin" => Auth::user()->isAdmin,
                 "token" => $sanctum_token
                 ]
             , 200);

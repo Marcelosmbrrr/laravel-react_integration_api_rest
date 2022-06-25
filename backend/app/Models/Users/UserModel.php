@@ -18,8 +18,6 @@ class UserModel extends Authenticatable
 
     public $table = "users";
     protected $guarded = [];
-    protected $hidden = ['password','remember_token'];
-    protected $casts = ['email_verified_at' => 'datetime'];
 
     /**
     * Relationship with telephone table
