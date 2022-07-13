@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { Login } from "../pages/Login/Login";
 import { Register } from "../pages/Register/Register";
 import { ForgotPassword } from "../pages/ForgotPassword/ForgotPassword";
@@ -9,19 +9,17 @@ export function Router() {
 
     return (
         <>
-            <Routes>
-                <Route path="register" element={<Register />} />
-                <Route path="forgot-password" element={<ForgotPassword />} />
-                <Route path="/" element={<Login />} />
-                <Route path="/lvreact/*"
-                    element={
-                        <AuthProvider>
-                            <SystemLayout />
-                        </AuthProvider>
-                    } />
-            </Routes>
+            <AuthProvider>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="register" element={<Register />} />
+                        <Route path="forgot-password" element={<ForgotPassword />} />
+                        <Route path="/" element={<Login />} />
+                        <Route path="/lvreact/*" element={<SystemLayout />} />
+                    </Routes>
+                </BrowserRouter>
+            </AuthProvider>
         </>
-
     );
 
 }

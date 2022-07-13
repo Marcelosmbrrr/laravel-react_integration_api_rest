@@ -53,16 +53,18 @@ export function Header(props: Props) {
 
     const handleLogout = () => {
 
-        const data = {};
+        const body = {}
 
         const config = {
-            headers: { Authorization: `Bearer ${localStorage.getItem("api_token")}` }
-        };
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+        }
 
-        setAuth(false);
-
-        AxiosApi.post('http://127.0.0.1:8000/api/logout', data, config)
+        AxiosApi.post('http://127.0.0.1:8000/api/logout', body, config)
             .then(function (response) {
+                setAuth(false);
+                localStorage.removeItem("token");
                 navigate("/");
             })
             .catch(function (error) {

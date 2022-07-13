@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Authentication;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class LogoutController extends Controller
 {
@@ -12,13 +11,11 @@ class LogoutController extends Controller
      * Logout.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Redirect
+     * @return \Illuminate\Http\Response
      */
-    public function logout(Request $request)
+    public function logout(Request $request) : \Illuminate\Http\Response
     {
         $request->user()->currentAccessToken()->delete();
-
-        return response("", 200);
-
+        return response([""], 200);
     }
 }

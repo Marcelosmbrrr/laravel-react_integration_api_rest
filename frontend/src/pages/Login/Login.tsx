@@ -16,6 +16,7 @@ import axios, { AxiosResponse } from 'axios';
 import { FormValidation } from '../../services/FormValidation';
 import { InformativeModal } from '../../components/InformativeModal/InformativeModal';
 import { AxiosApi } from '../../services/AxiosApi';
+import { useAuth } from '../../context/AuthContext';
 // Types
 import { RequestStatus } from '../../common/types';
 import { FieldError } from '../../common/types';
@@ -25,6 +26,7 @@ import { FormData } from '../../common/types';
 
 export const Login = React.memo(() => {
 
+    const { isAuth, setAuth } = useAuth();
     const navigate = useNavigate();
 
     const [formData, setFormData] = React.useState<FormData>({ email: null, password: null });
@@ -63,19 +65,19 @@ export const Login = React.memo(() => {
                 successServerResponse(response);
             })
             .catch(function (error) {
-                console.log(error);
+                console.log(error.response);
                 errorServerResponse(error.response);
             })
     }
 
     const successServerResponse = (response: AxiosResponse): void => {
 
-        setServerResponse({ status: true, error: false, message: response.data.message });
+        setServerResponse({ status: true, error: false, message: "Acesso autorizado!" });
 
-        localStorage.setItem("api_token", response.data.token);
-        localStorage.setItem("auth_name", response.data.name);
+        localStorage.setItem("token", response.data.token);
 
         setTimeout(() => {
+            setAuth(true);
             navigate("/lvreact");
         }, 3000);
 

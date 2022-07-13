@@ -67,9 +67,9 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 const modules = [
-    { id: "Dashboard", icon: <DashboardIcon /> },
-    { id: "Administration", icon: <AdminPanelSettingsIcon /> },
-    { id: "Profile", icon: <AssignmentIndIcon /> }
+    { id: "Dashboard", path: "", icon: <DashboardIcon />, end: true },
+    { id: "Administration", path: "administration", icon: <AdminPanelSettingsIcon />, end: false },
+    { id: "Profile", path: "profile", icon: <AssignmentIndIcon />, end: false }
 ];
 
 const navLinkActivated: { color: string } = {
@@ -114,7 +114,7 @@ export function Navigation({ ...props }) {
                                     justifyContent: 'center',
                                 }}
                             >
-                                <NavLink to={module.id.toLowerCase()} style={({ isActive }) => isActive ? navLinkActivated : navLinkInative}>{module.icon}</NavLink>
+                                <NavLink to={module.path} style={({ isActive }) => isActive ? navLinkActivated : navLinkInative} end={module.end}>{module.icon}</NavLink>
                             </ListItemIcon>
                             <ListItemText primary={module.id} sx={{ opacity: props.open ? 1 : 0 }} />
                         </ListItemButton>

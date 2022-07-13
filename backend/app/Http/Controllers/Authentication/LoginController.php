@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 // Models
 use App\Models\Users\UserModel;
 // Form Request
@@ -22,28 +23,24 @@ class LoginController extends Controller
     public function login(LoginFormRequest $request) : \Illuminate\Http\Response 
     {
      
-        if(Auth::attempt($request->only(["email", "password"]))){
+        $user = UserModel::where("email", $request->email)->first();
 
-            $user = UserModel::findOrFail(Auth::user()->id);
+        if(!$user || !Hash::check($request->password, $user->password)){
 
-            // The sanctum token is created with a value that will be hashed
-            $role = Auth::user()->isAdmin ? "admin" : "user";
-            $sanctum_token = $user->createToken(Str::random(10), ["role:$role"])->plainTextToken;
-
-            return response(
-                [
-                "message" => "Acesso autorizado!", 
-                "user" => Auth::user()->id,
-                "isAdmin" => Auth::user()->isAdmin,
-                "token" => $sanctum_token
-                ]
-            , 200);
-
-        }else{
-
-            return response(["message" => "Email ou senha incorretos!"], 401);
+            return response(["message" => "Invalid credentials!"], 401);
 
         }
+
+        $role = $user->is_admin ? "admin" : "customer";
+
+        $api_token = $user->createToken("token", ["role:{$role}"])->plainTextToken;
+
+        return response([
+            "user" => $user->name,
+            "email" => $user->email,
+            "role" => $role,
+            "token" => $api_token
+        ], 200);
 
     }
 }
