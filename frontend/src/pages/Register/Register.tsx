@@ -21,7 +21,7 @@ import { FieldErrorMessage } from '../../common/types';
 import { InputValidation } from '../../common/types';
 import { FormData } from '../../common/types';
 import { ServerValidationErrors } from '../../common/types';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 
 const radio_options: { value: string, label: string }[] = [
     { value: "m", label: "Male" },
@@ -46,9 +46,7 @@ export const Register = React.memo(() => {
         event.preventDefault();
 
         if (formularyDataValidate()) {
-
             serverRequestExecution();
-
         }
 
     };
@@ -64,11 +62,7 @@ export const Register = React.memo(() => {
         setFieldError({ name: nameValidation.error, sex: sexValidation.error, email: emailValidation.error, password: passwordValidation.error, password_confirmation: passwordConfirmationValidation.error });
         setFieldErrorMessage({ name: nameValidation.message, sex: sexValidation.message, email: emailValidation.message, password: passwordValidation.message, password_confirmation: passwordConfirmationValidation.message });
 
-        if (nameValidation.error || sexValidation.error || emailValidation.error || passwordValidation.error || passwordConfirmationValidation.error) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(nameValidation.error || sexValidation.error || emailValidation.error || passwordValidation.error || passwordConfirmationValidation.error);
 
     }
 
@@ -77,29 +71,38 @@ export const Register = React.memo(() => {
         AxiosApi.post('http://127.0.0.1:8000/api/register', formData)
             .then(function (response) {
 
-                setServerResponse({ status: true, error: false, message: response.data.message });
-
-                setTimeout(() => {
-                    window.location.href = "http://localhost:3000/";
-                }, 3000);
+                successServerRequest(response);
 
             })
             .catch(function (error) {
 
-                errorServerRequest(error);
+                errorServerRequest(error.response);
 
             })
 
     }
 
-    const errorServerRequest = (error: any): void => {
+    const successServerRequest = (response: AxiosResponse) => {
 
-        setServerResponse({ status: true, error: true, message: error.message });
+        setServerResponse({ status: true, error: false, message: response.data.message });
 
-        const error_data = error.response.data;
+        setTimeout(() => {
+            window.location.href = "http://localhost:3000/";
+        }, 3000);
+
+    }
+
+    const errorServerRequest = (response: AxiosResponse): void => {
+
+        const error_message = response.data.message ? response.data.message : "Server Error!";
+        setServerResponse({ status: true, error: true, message: error_message });
+
+        setTimeout(() => {
+            setServerResponse({ status: false, error: false, message: "" });
+        }, 2000);
 
         // Definição dos objetos de erro possíveis de serem retornados pelo validation do Laravel
-        let server_validation_args: ServerValidationErrors = {
+        let server_validation: ServerValidationErrors = {
             name: { error: false, message: "" },
             sex: { error: false, message: "" },
             email: { error: false, message: "" },
@@ -108,36 +111,31 @@ export const Register = React.memo(() => {
         }
 
         // Coleta dos objetos de erro existentes na response
-        for (let prop in error_data.errors) {
+        for (let prop in response.data.errors) {
 
-            server_validation_args[prop] = {
+            server_validation[prop] = {
                 error: true,
-                message: error_data.errors[prop][0]
+                message: response.data.errors[prop][0]
             }
 
         }
 
         setFieldError({
-            name: server_validation_args.name.error,
-            sex: server_validation_args.sex.error,
-            email: server_validation_args.email.error,
-            password: server_validation_args.password.error,
-            password_confirmation: server_validation_args.password_confirmation.error
+            name: server_validation.name.error,
+            sex: server_validation.sex.error,
+            email: server_validation.email.error,
+            password: server_validation.password.error,
+            password_confirmation: server_validation.password_confirmation.error
         });
 
 
         setFieldErrorMessage({
-            name: server_validation_args.name.message,
-            sex: server_validation_args.sex.message,
-            email: server_validation_args.email.message,
-            password: server_validation_args.password.message,
-            password_confirmation: server_validation_args.password_confirmation.message
+            name: server_validation.name.message,
+            sex: server_validation.sex.message,
+            email: server_validation.email.message,
+            password: server_validation.password.message,
+            password_confirmation: server_validation.password_confirmation.message
         });
-
-        setTimeout(() => {
-            setServerResponse({ status: false, error: false, message: "" });
-        }, 3000);
-
 
     }
 

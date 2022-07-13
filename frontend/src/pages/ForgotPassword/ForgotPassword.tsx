@@ -39,9 +39,7 @@ export const ForgotPassword = React.memo(() => {
         event.preventDefault();
 
         if (formularyEmailValidate()) {
-
             getCodeServerRequestExecution();
-
         }
     }
 
@@ -49,9 +47,7 @@ export const ForgotPassword = React.memo(() => {
         event.preventDefault();
 
         if (formularyUpdatePasswordValidate()) {
-
             updatePasswordServerRequestExecution();
-
         }
     }
 
@@ -64,28 +60,20 @@ export const ForgotPassword = React.memo(() => {
         setFieldError({ code: false, email: false, new_password: false, new_password_confirmation: false });
         setFieldErrorMessage({ code: "", email: "", new_password: "", new_password_confirmation: "" });
 
-        if (emailValidation.error) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(emailValidation.error);
 
     }
 
     const formularyUpdatePasswordValidate = (): Boolean => {
 
-        const codeValidation: InputValidation = FormValidation(formDataChangePassword.code, 5, 5, null, "code");
+        const codeValidation: InputValidation = FormValidation(formDataChangePassword.code, 10, 10, null, "code");
         const newPasswordValidation: InputValidation = FormValidation(formDataChangePassword.new_password, 3, null, null, "new password");
         const newPasswordConfirmationValidation: InputValidation = formDataChangePassword.new_password === formDataChangePassword.new_password_confirmation ? { error: false, message: "" } : { error: true, message: "The passwords do not match" }
 
         setFieldError({ code: codeValidation.error, email: false, new_password: newPasswordValidation.error, new_password_confirmation: newPasswordConfirmationValidation.error });
         setFieldErrorMessage({ code: codeValidation.message, email: "", new_password: newPasswordValidation.message, new_password_confirmation: newPasswordConfirmationValidation.message });
 
-        if (codeValidation.error || newPasswordValidation.error || newPasswordConfirmationValidation.error) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(codeValidation.error || newPasswordValidation.error || newPasswordConfirmationValidation.error);
 
     }
 
@@ -95,7 +83,7 @@ export const ForgotPassword = React.memo(() => {
             .then(function (response) {
 
                 setDisabledForm(false);
-                setServerResponse({ status: true, error: false, message: "Success! Check your email!" });
+                setServerResponse({ status: true, error: false, message: response.data.message });
 
                 setTimeout(() => {
                     setServerResponse({ status: false, error: false, message: "" });
@@ -109,7 +97,7 @@ export const ForgotPassword = React.memo(() => {
 
                 setTimeout(() => {
                     setServerResponse({ status: false, error: false, message: "" });
-                }, 3000);
+                }, 2000);
 
             })
 

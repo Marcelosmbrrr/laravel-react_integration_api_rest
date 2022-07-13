@@ -11,9 +11,11 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 // Libs
 import { Link, useNavigate } from "react-router-dom";
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 // Custom
 import { FormValidation } from '../../services/FormValidation';
+import { InformativeModal } from '../../components/InformativeModal/InformativeModal';
+import { AxiosApi } from '../../services/AxiosApi';
 // Types
 import { RequestStatus } from '../../common/types';
 import { FieldError } from '../../common/types';
@@ -38,9 +40,7 @@ export const Login = React.memo(() => {
         event.preventDefault();
 
         if (formularyDataValidate()) {
-
             serverRequestExecution();
-
         }
     }
 
@@ -52,34 +52,44 @@ export const Login = React.memo(() => {
         setFieldError({ email: emailValidation.error, password: passwordValidation.error });
         setFieldErrorMessage({ email: emailValidation.message, password: passwordValidation.message });
 
-        if (emailValidation.error || passwordValidation.error) {
-
-            return false;
-
-        } else {
-
-            return true;
-
-        }
+        return !(emailValidation.error || passwordValidation.error);
 
     }
 
     const serverRequestExecution = () => {
 
-        axios.post('http://127.0.0.1:8000/api/login', formData)
+        AxiosApi.post('http://127.0.0.1:8000/api/login', formData)
             .then(function (response) {
-
-                localStorage.setItem("auth_token", response.data.token);
-                localStorage.setItem("auth_name", response.data.name);
-
-                navigate("/lvreact");
-
+                successServerResponse(response);
             })
             .catch(function (error) {
-
-                navigate("/");
-
+                console.log(error);
+                errorServerResponse(error.response);
             })
+    }
+
+    const successServerResponse = (response: AxiosResponse): void => {
+
+        setServerResponse({ status: true, error: false, message: response.data.message });
+
+        localStorage.setItem("api_token", response.data.token);
+        localStorage.setItem("auth_name", response.data.name);
+
+        setTimeout(() => {
+            navigate("/lvreact");
+        }, 3000);
+
+    }
+
+    const errorServerResponse = (response: AxiosResponse): void => {
+
+        const error_message = response.data.message ? response.data.message : "Server Error!";
+        setServerResponse({ status: true, error: true, message: error_message });
+
+        setTimeout(() => {
+            setServerResponse({ status: false, error: false, message: "" });
+        }, 2000);
+
     }
 
     return (
@@ -148,6 +158,11 @@ export const Login = React.memo(() => {
                             </Link>
                         </Grid>
                     </Grid>
+
+                    {serverResponse.status &&
+                        <InformativeModal content={{ text: serverResponse.message, error: serverResponse.error }} />
+                    }
+
                 </Box>
             </Box>
         </Container>

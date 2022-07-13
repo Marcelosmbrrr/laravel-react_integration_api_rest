@@ -1,15 +1,26 @@
 import * as React from 'react';
 // Material UI
+import { AxiosApi } from '../../services/AxiosApi';
 import MenuIcon from '@mui/icons-material/Menu';
-import { IconButton, Toolbar, Typography } from '@mui/material';
+import LogoutIcon from '@mui/icons-material/Logout';
+import IconButton from '@mui/material/IconButton';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { styled } from '@mui/material/styles';
-import { Box } from '@mui/material';
+import { Box, Toolbar, Typography } from '@mui/material';
+import { useAuth } from '../../context/AuthContext';
+// Routes
+import { Routes, Route, Link, useNavigate } from "react-router-dom";
 
 const drawerWidth = 240;
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
+}
+
+interface Props {
+    open: boolean,
+    setOpen: Function,
+    page: string
 }
 
 const AppBar = styled(MuiAppBar, {
@@ -31,11 +42,33 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 
-export function Header({ ...props }) {
+export function Header(props: Props) {
+
+    const { isAuth, setAuth } = useAuth();
+    const navigate = useNavigate();
 
     const handleDrawerOpen = () => {
         props.setOpen(true);
-    };
+    }
+
+    const handleLogout = () => {
+
+        const data = {};
+
+        const config = {
+            headers: { Authorization: `Bearer ${localStorage.getItem("api_token")}` }
+        };
+
+        setAuth(false);
+
+        AxiosApi.post('http://127.0.0.1:8000/api/logout', data, config)
+            .then(function (response) {
+                navigate("/");
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
 
     return (
         <>
@@ -60,7 +93,9 @@ export function Header({ ...props }) {
                     </Box>
                     <Box>
                         <Typography variant="h6" noWrap component="div">
-                            <a href='/'>Logout</a>
+                            <IconButton onClick={() => handleLogout()}>
+                                <LogoutIcon />
+                            </IconButton>
                         </Typography>
                     </Box>
                 </Toolbar>

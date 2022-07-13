@@ -13,12 +13,12 @@ export function Router() {
                 <Route path="register" element={<Register />} />
                 <Route path="forgot-password" element={<ForgotPassword />} />
                 <Route path="/" element={<Login />} />
-                <Route path="/lvreact/*" 
-                element={
-                <AuthProvider>
-                    <SystemLayout />
-                </AuthProvider>
-                } />
+                <Route path="/lvreact/*"
+                    element={
+                        <AuthProvider>
+                            <SystemLayout />
+                        </AuthProvider>
+                    } />
             </Routes>
         </>
 
