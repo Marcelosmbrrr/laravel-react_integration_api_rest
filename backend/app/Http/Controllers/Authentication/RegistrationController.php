@@ -21,34 +21,23 @@ class RegistrationController extends Controller
      */
     public function register(RegistrationFormRequest $request) : \Illuminate\Http\Response 
     {
+        DB::transaction(function () use ($request) {
 
-        dd("register");
+            $new_user = UserModel::create([
+                "name" => $request->name,
+                "email" => $request->email,
+                "sex" => $request->sex,
+                "is_admin" => false,
+                "password" => Hash::make($request->password)
+            ]);
 
-        try{
+            $new_user->telephone()->create([
+                "user_id" => $new_user->id
+            ]);
 
-            DB::transaction(function () use ($request) {
+        });
 
-                $new_user = UserModel::create([
-                    "name" => $request->name,
-                    "email" => $request->email,
-                    "sex" => $request->sex,
-                    "is_admin" => false,
-                    "password" => Hash::make($request->password)
-                ]);
-    
-                $new_user->telephone()->create([
-                    "user_id" => $new_user->id
-                ]);
-
-            });
-
-            return response(["message" => "Success!"], 201);
-
-        }catch(\Exception $e){
-
-            return response(["error" => $e->getMessage()], 500);
-
-        }
+        return response(["message" => "Success!"], 201); 
 
     }
 }

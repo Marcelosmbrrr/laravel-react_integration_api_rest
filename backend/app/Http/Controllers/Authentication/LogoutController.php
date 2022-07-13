@@ -14,13 +14,11 @@ class LogoutController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Redirect
      */
-    public function logout(Request $request) : \Illuminate\Http\Redirect
+    public function logout(Request $request)
     {
+        $request->user()->currentAccessToken()->delete();
 
-        Auth::logout();
-
-        $request->user()->tokens()->delete();
-
+        return response("", 200);
 
     }
 }

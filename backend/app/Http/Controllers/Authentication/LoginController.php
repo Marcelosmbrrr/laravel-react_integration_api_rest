@@ -28,10 +28,11 @@ class LoginController extends Controller
 
             // The sanctum token is created with a value that will be hashed
             $role = Auth::user()->isAdmin ? "admin" : "user";
-            $sanctum_token = $user->createToken(Str::random(10), ["role" => $role])->plainTextToken;
+            $sanctum_token = $user->createToken(Str::random(10), ["role:$role"])->plainTextToken;
 
             return response(
-                ["message" => "Acesso autorizado!", 
+                [
+                "message" => "Acesso autorizado!", 
                 "user" => Auth::user()->id,
                 "isAdmin" => Auth::user()->isAdmin,
                 "token" => $sanctum_token

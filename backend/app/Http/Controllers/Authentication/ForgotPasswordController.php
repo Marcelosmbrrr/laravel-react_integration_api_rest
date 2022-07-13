@@ -22,19 +22,19 @@ class ForgotPasswordController extends Controller
      */
     public function getToken(Request $request) : \Illuminate\Http\Response {
 
-        dd("get token");
-
         $validated = $request->validate([
             'email' => 'required|exists:users,email'
         ]);
 
         $user = UserModel::where('email', $request->email)->first();
 
-        $user->token()->updateOrCreate(["token" => Str::random(5)]);
+        $token = Str::random(10);
 
-        // Enviar email para o usuário com o Token
+        $user->token()->create(["token" => $token]);
 
-        return response("", 200);
+        // Send email to user with the token
+
+        return response(["message" => "Success! Check your email!"], 200);
 
     }
 
@@ -46,15 +46,15 @@ class ForgotPasswordController extends Controller
      */
     public function changePassword(ChangePasswordByCodeRequest $request) : \Illuminate\Http\Response {
 
-        dd("change password");
-
         $token = TokenModel::firstOrFail($request->code);
 
         $token->user()->update(["password" => $request->new_password]);
 
-        // Enviar email para o usuário confirmando a alteração
+        $token->delete();
 
-        return response("", 200);
+       // Send email to user about the password change confirmation
+
+        return response(["message" => "Success! Your password has been changed!"], 200);
 
     }
 }
