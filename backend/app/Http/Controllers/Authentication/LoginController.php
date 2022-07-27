@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Users\UserModel;
 // Form Request
 use App\Http\Requests\Authentication\LoginFormRequest;
+// Notification
+use App\Notifications\Authentication\LoginNotification;
 
 class LoginController extends Controller
 {
@@ -22,10 +24,10 @@ class LoginController extends Controller
      */
     public function login(LoginFormRequest $request) : \Illuminate\Http\Response 
     {
-     
-        $user = UserModel::where("email", $request->email)->first();
 
-        if(!$user || !Hash::check($request->password, $user->password)){
+        $user = UserModel::where("email", $request->email)->firstOrFail();
+
+        if(Hash::check($request->password, $user->password)){
 
             return response(["message" => "Invalid credentials!"], 401);
 
@@ -34,6 +36,8 @@ class LoginController extends Controller
         $role = $user->is_admin ? "admin" : "customer";
 
         $api_token = $user->createToken("token", ["role:{$role}"])->plainTextToken;
+
+        $user->notify(new LoginNotification($user));
 
         return response([
             "user" => $user->name,

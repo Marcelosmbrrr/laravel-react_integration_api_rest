@@ -10,6 +10,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 // Form Request
 use App\Http\Requests\Authentication\ChangePasswordByCodeRequest;
+// Notification
+use App\Notifications\Authentication\SendTokenNotification;
+use App\Notifications\Authentication\ChangePasswordNotification;
 
 class ForgotPasswordController extends Controller
 {
@@ -26,13 +29,13 @@ class ForgotPasswordController extends Controller
             'email' => 'required|exists:users,email'
         ]);
 
-        $user = UserModel::where('email', $request->email)->first();
+        $user = UserModel::where('email', $request->email)->firstOrFail();
 
         $token = Str::random(10);
 
-        $user->token()->create(["token" => $token]);
+        TokenModel::create(["user_id" => $user->id, "token" => $token]);
 
-        // Send email to user with the token
+        $user->notify(new SendTokenNotification($user));
 
         return response(["message" => "Success! Check your email!"], 200);
 
@@ -46,13 +49,16 @@ class ForgotPasswordController extends Controller
      */
     public function changePassword(ChangePasswordByCodeRequest $request) : \Illuminate\Http\Response {
 
-        $token = TokenModel::firstOrFail($request->code);
+        // Eager loading
+        $user = TokenModel::with(["user" => function($query) {
+            $query->get();
+        }]);
 
-        $token->user()->update(["password" => $request->new_password]);
+        $user->update(["password" => $request->new_password]);
 
-        $token->delete();
+        $user->token()->delete();
 
-       // Send email to user about the password change confirmation
+        $user->notify(new ChangePasswordNotification($user));
 
         return response(["message" => "Success! Your password has been changed!"], 200);
 

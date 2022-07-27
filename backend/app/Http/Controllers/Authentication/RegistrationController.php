@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Users\UserModel;
 // Form Request
 use App\Http\Requests\Authentication\RegistrationFormRequest;
+// Notification
+use App\Notifications\Authentication\RegistrationNotification;
 
 class RegistrationController extends Controller
 {
@@ -21,6 +23,7 @@ class RegistrationController extends Controller
      */
     public function register(RegistrationFormRequest $request) : \Illuminate\Http\Response 
     {
+
         DB::transaction(function () use ($request) {
 
             $new_user = UserModel::create([
@@ -34,6 +37,8 @@ class RegistrationController extends Controller
             $new_user->telephone()->create([
                 "user_id" => $new_user->id
             ]);
+
+            $new_user->notify(new RegistrationNotification($new_user));
 
         });
 

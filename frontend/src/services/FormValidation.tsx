@@ -9,27 +9,27 @@ export function FormValidation(value: any, min_length: number | null, max_length
 
         if (regex != null) {
 
-            if (!regexCheck(value, regex)) {
+            if (regexCheck(value, regex)) {
 
                 return { error: true, message: "The " + field_name + " is invalid" };
 
             }
 
-        } 
-        
+        }
+
         if (min_length != null) {
 
-            if (!minLengthCheck(value, min_length)) {
+            if (minLengthCheck(value, min_length)) {
 
                 return { error: true, message: "The " + field_name + " must be at least " + min_length + " characters" };
 
             }
 
-        } 
-        
+        }
+
         if (max_length != null) {
 
-            if (!maxLengthCheck(value, max_length)) {
+            if (maxLengthCheck(value, max_length)) {
 
                 return { error: true, message: "The " + field_name + " must have a maximum of " + min_length + " characters" };
 
@@ -48,17 +48,17 @@ export function FormValidation(value: any, min_length: number | null, max_length
 }
 
 const nullCheck = (value: any): boolean => {
-    return value != null ? true : false;
+    return value != null;
 }
 
 const regexCheck = (value: any, regex: RegExp): boolean => {
-    return value.match(regex) ? true : false;
+    return !value.match(regex);
 }
 
 const minLengthCheck = (value: any, min_length: number): boolean => {
-    return value.length >= min_length ? true : false;
+    return value.length < min_length;
 }
 
 const maxLengthCheck = (value: any, max_length: number): boolean => {
-    return value.length <= max_length ? true : false;
+    return value.length > max_length;
 }

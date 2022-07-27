@@ -65,7 +65,7 @@ export const Login = React.memo(() => {
                 successServerResponse(response);
             })
             .catch(function (error) {
-                console.log(error.response);
+                console.log(error);
                 errorServerResponse(error.response);
             })
     }

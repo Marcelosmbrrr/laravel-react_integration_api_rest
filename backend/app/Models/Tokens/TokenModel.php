@@ -4,16 +4,17 @@ namespace App\Models\Tokens;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 // Models
 use App\Models\Users\UserModel;
 
 class TokenModel extends Model
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     public $table = "tokens";
     public $timestamps = false;
-    protected $fillable = ["*"];
+    protected $guarded = [];
 
     /**
     * Relationship with user table
