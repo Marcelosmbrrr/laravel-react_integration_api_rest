@@ -119,11 +119,19 @@ export const ForgotPassword = React.memo(() => {
                 setServerResponse({ status: true, error: false, message: response.data.message });
                 setFormDataChangePassword({ token: "", new_password: "", new_password_confirmation: "" });
 
+                setTimeout(() => {
+                    setServerResponse({ status: false, error: false, message: "" });
+                }, 2000);
+
             })
             .catch(function (error) {
 
                 setLoading(false);
                 setServerResponse({ status: true, error: error, message: error.response.data.message });
+
+                setTimeout(() => {
+                    setServerResponse({ status: false, error: false, message: "" });
+                }, 2000);
 
             })
 
