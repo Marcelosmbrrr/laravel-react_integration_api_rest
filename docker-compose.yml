@@ -3,19 +3,60 @@ version: "3.7"
 volumes:
   lvreact_mysql:
 
+
 networks:
   lvreact_net:
     driver: bridge
 
 services:
 
-  #app:
-    #image: bitnami/laravel
+  frontend:
+    image: frontend/
+    networks:
+      - lvreact_net
+    ports:
+      - 3000:3000
+    environment:
+      - BACKEND_PORT=8000
+    depends_on:
+      - backend
+
+  backend:
+    image: backend/
+    networks:
+      - lvreact_net
+    ports:
+      - 8000:80
+    volumes:
+      - .:/var/www/html/
+      - ./conf:/etc/nginx/conf.d
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql_db
+      - DB_PORT=3306
+      - DB_DATABASE=lvreact
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+    depends_on:
+      - mysql_db
+    links:
+      - php
+
+  php:
+    image: php:8.1-fpm
+    container_name: php-fpm
+    networks:
+      - php_mysql_network
+    volumes:
+      - ./www:/var/www/html/
+    depends_on:
+      - mysql_db
 
   mysql_db:
     image: mysql
     volumes:
       - lvreact_mysql:/var/lib/mysql
+      - ./db/dump.sql:/docker-entrypoint-initdb.d/dump.sql
     networks:
       - lvreact_net
     ports:

@@ -68,7 +68,7 @@ class ForgotPasswordController extends Controller
 
         });
 
-        return response(["message" => "Success! Your password has been changed!"], 200);
+        return response(["message" => "Your password has been changed!"], 200);
 
     }
 }
