@@ -14,6 +14,7 @@ import { AxiosApi } from '../../services/AxiosApi';
 import { RadioForm } from '../../components/RadioGroup/RadioForm';
 import { FormValidation } from "../../services/FormValidation";
 import { InformativeModal } from "../../components/InformativeModal/InformativeModal";
+import { BackdropMUI } from '../../components/Backdrop/BackdropMUI';
 // Types
 import { RequestStatus } from '../../common/types';
 import { FieldError } from '../../common/types';
@@ -33,6 +34,7 @@ export const Register = React.memo(() => {
     const [formData, setFormData] = React.useState<FormData>({ name: "", sex: "", email: "", password: "", password_confirmation: "" });
     const [fieldError, setFieldError] = React.useState<FieldError>({ name: false, sex: false, email: false, password: false, password_confirmation: false });
     const [fieldErrorMessage, setFieldErrorMessage] = React.useState<FieldErrorMessage>({ name: "", sex: "", email: "", password: "", password_confirmation: "" });
+    const [loading, setLoading] = React.useState<boolean>(false);
     const [serverResponse, setServerResponse] = React.useState<RequestStatus>({ status: false, error: false, message: "" });
 
     /*
@@ -46,6 +48,7 @@ export const Register = React.memo(() => {
         event.preventDefault();
 
         if (formularyDataValidate()) {
+            setLoading(true);
             serverRequestExecution();
         }
 
@@ -71,11 +74,13 @@ export const Register = React.memo(() => {
         AxiosApi.post('http://127.0.0.1:8000/api/register', formData)
             .then(function (response) {
 
+                setLoading(false);
                 successServerRequest(response);
 
             })
             .catch(function (error) {
 
+                setLoading(false);
                 errorServerRequest(error.response);
 
             })
@@ -216,6 +221,8 @@ export const Register = React.memo(() => {
                     {serverResponse.status &&
                         <InformativeModal content={{ text: serverResponse.message, error: serverResponse.error }} />
                     }
+
+                    {loading && <BackdropMUI />}
 
                     <Button
                         type="submit"

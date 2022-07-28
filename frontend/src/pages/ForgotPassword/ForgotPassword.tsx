@@ -15,6 +15,7 @@ import { Link } from "react-router-dom";
 // Custom 
 import { FormValidation } from '../../services/FormValidation';
 import { InformativeModal } from '../../components/InformativeModal/InformativeModal';
+import { BackdropMUI } from '../../components/Backdrop/BackdropMUI';
 // Types
 import { RequestStatus } from '../../common/types';
 import { FieldError } from '../../common/types';
@@ -29,6 +30,7 @@ export const ForgotPassword = React.memo(() => {
     const [fieldError, setFieldError] = React.useState<FieldError>({ email: false, token: false, new_password: false, new_password_confirmation: false });
     const [fieldErrorMessage, setFieldErrorMessage] = React.useState<FieldErrorMessage>({ email: "", token: "", new_password: "", new_password_confirmation: "" });
     const [serverResponse, setServerResponse] = React.useState<RequestStatus>({ status: false, error: false, message: "" });
+    const [loading, setLoading] = React.useState<boolean>(false);
     const [disabledForm, setDisabledForm] = React.useState(true);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -39,6 +41,7 @@ export const ForgotPassword = React.memo(() => {
         event.preventDefault();
 
         if (formularyEmailValidate()) {
+            setLoading(true);
             getCodeServerRequestExecution();
         }
     }
@@ -47,6 +50,7 @@ export const ForgotPassword = React.memo(() => {
         event.preventDefault();
 
         if (formularyUpdatePasswordValidate()) {
+            setLoading(true);
             updatePasswordServerRequestExecution();
         }
     }
@@ -82,6 +86,7 @@ export const ForgotPassword = React.memo(() => {
         Axios.post('http://127.0.0.1:8000/api/change-password-token', formDataEmail)
             .then(function (response) {
 
+                setLoading(false);
                 setDisabledForm(false);
                 setServerResponse({ status: true, error: false, message: response.data.message });
 
@@ -92,6 +97,7 @@ export const ForgotPassword = React.memo(() => {
             })
             .catch(function (error) {
 
+                setLoading(false);
                 setDisabledForm(true);
                 setServerResponse({ status: true, error: true, message: error.response.data.message });
 
@@ -108,6 +114,7 @@ export const ForgotPassword = React.memo(() => {
         Axios.post('http://127.0.0.1:8000/api/change-password', formDataChangePassword)
             .then(function (response) {
 
+                setLoading(false);
                 setDisabledForm(true);
                 setServerResponse({ status: true, error: false, message: response.data.message });
                 setFormDataChangePassword({ token: "", new_password: "", new_password_confirmation: "" });
@@ -115,6 +122,7 @@ export const ForgotPassword = React.memo(() => {
             })
             .catch(function (error) {
 
+                setLoading(false);
                 setServerResponse({ status: true, error: error, message: error.response.data.message });
 
             })
@@ -214,6 +222,8 @@ export const ForgotPassword = React.memo(() => {
                     {serverResponse.status &&
                         <InformativeModal content={{ text: serverResponse.message, error: serverResponse.error }} />
                     }
+
+                    {loading && <BackdropMUI />}
 
                     <Button
                         type="submit"
