@@ -20,7 +20,7 @@ class ChangePasswordNotification extends Notification
      *
      * @return void
      */
-    function __contruct(UserModel $user){
+    function __contruct($user){
         $this->user = $user;
     }
 

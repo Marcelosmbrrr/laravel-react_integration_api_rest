@@ -25,7 +25,7 @@ class ChangePasswordByCodeRequest extends FormRequest
     {
         return [
             "new_password" => "required|confirmed",
-            "token" => "required|numeric"
+            "token" => "required"
         ];
     }
 }

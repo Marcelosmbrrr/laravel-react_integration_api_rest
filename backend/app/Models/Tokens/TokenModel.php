@@ -13,6 +13,7 @@ class TokenModel extends Model
     use HasFactory, Notifiable;
 
     public $table = "tokens";
+    protected $primaryKey = 'user_id';
     public $timestamps = false;
     protected $guarded = [];
 

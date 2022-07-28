@@ -8,6 +8,7 @@ use App\Models\Users\UserModel;
 use App\Models\Tokens\TokenModel;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 // Form Request
 use App\Http\Requests\Authentication\ChangePasswordByCodeRequest;
 // Notification
@@ -29,13 +30,19 @@ class ForgotPasswordController extends Controller
             'email' => 'required|exists:users,email'
         ]);
 
-        $user = UserModel::where('email', $request->email)->firstOrFail();
+        DB::transaction(function () use ($request) {
+            
+            $user = UserModel::where('email', $request->email)->firstOrFail();
 
-        $token = Str::random(10);
+            $token = Str::random(10);
 
-        TokenModel::create(["user_id" => $user->id, "token" => $token]);
+            $user->token()->delete();
 
-        $user->notify(new SendTokenNotification($user));
+            TokenModel::create(["user_id" => $user->id, "token" => $token]);
+
+            $user->notify(new SendTokenNotification($user));
+
+        });
 
         return response(["message" => "Success! Check your email!"], 200);
 
@@ -49,16 +56,17 @@ class ForgotPasswordController extends Controller
      */
     public function changePassword(ChangePasswordByCodeRequest $request) : \Illuminate\Http\Response {
 
-        // Eager loading
-        $user = TokenModel::with(["user" => function($query) {
-            $query->get();
-        }]);
+        DB::transaction(function () use ($request) {
 
-        $user->update(["password" => $request->new_password]);
+            $user_by_token = TokenModel::where("token", $request->token)->firstOrFail();
+            
+            $user_by_token->user()->update(["password" => $request->new_password]);
 
-        $user->token()->delete();
+            $user_by_token->delete();
 
-        $user->notify(new ChangePasswordNotification($user));
+            $user_by_token->notify(new ChangePasswordNotification($user_by_token->user));
+
+        });
 
         return response(["message" => "Success! Your password has been changed!"], 200);
 

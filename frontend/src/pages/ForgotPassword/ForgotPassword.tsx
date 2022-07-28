@@ -25,9 +25,9 @@ import { FormData } from '../../common/types';
 export const ForgotPassword = React.memo(() => {
 
     const [formDataEmail, setFormDataEmail] = React.useState<FormData>({ email: "" });
-    const [formDataChangePassword, setFormDataChangePassword] = React.useState<FormData>({ code: "", new_password: "", new_password_confirmation: "" });
-    const [fieldError, setFieldError] = React.useState<FieldError>({ email: false, code: false, new_password: false, new_password_confirmation: false });
-    const [fieldErrorMessage, setFieldErrorMessage] = React.useState<FieldErrorMessage>({ email: "", code: "", new_password: "", new_password_confirmation: "" });
+    const [formDataChangePassword, setFormDataChangePassword] = React.useState<FormData>({ token: "", new_password: "", new_password_confirmation: "" });
+    const [fieldError, setFieldError] = React.useState<FieldError>({ email: false, token: false, new_password: false, new_password_confirmation: false });
+    const [fieldErrorMessage, setFieldErrorMessage] = React.useState<FieldErrorMessage>({ email: "", token: "", new_password: "", new_password_confirmation: "" });
     const [serverResponse, setServerResponse] = React.useState<RequestStatus>({ status: false, error: false, message: "" });
     const [disabledForm, setDisabledForm] = React.useState(true);
 
@@ -57,8 +57,8 @@ export const ForgotPassword = React.memo(() => {
 
         const emailValidation: InputValidation = FormValidation(formDataEmail.email, null, null, emailPattern, "email");
 
-        setFieldError({ code: false, email: false, new_password: false, new_password_confirmation: false });
-        setFieldErrorMessage({ code: "", email: "", new_password: "", new_password_confirmation: "" });
+        setFieldError({ token: false, email: false, new_password: false, new_password_confirmation: false });
+        setFieldErrorMessage({ token: "", email: "", new_password: "", new_password_confirmation: "" });
 
         return !(emailValidation.error);
 
@@ -66,12 +66,12 @@ export const ForgotPassword = React.memo(() => {
 
     const formularyUpdatePasswordValidate = (): Boolean => {
 
-        const codeValidation: InputValidation = FormValidation(formDataChangePassword.code, 10, 10, null, "code");
+        const codeValidation: InputValidation = FormValidation(formDataChangePassword.token, 10, 10, null, "token");
         const newPasswordValidation: InputValidation = FormValidation(formDataChangePassword.new_password, 3, null, null, "new password");
         const newPasswordConfirmationValidation: InputValidation = formDataChangePassword.new_password === formDataChangePassword.new_password_confirmation ? { error: false, message: "" } : { error: true, message: "The passwords do not match" }
 
-        setFieldError({ code: codeValidation.error, email: false, new_password: newPasswordValidation.error, new_password_confirmation: newPasswordConfirmationValidation.error });
-        setFieldErrorMessage({ code: codeValidation.message, email: "", new_password: newPasswordValidation.message, new_password_confirmation: newPasswordConfirmationValidation.message });
+        setFieldError({ token: codeValidation.error, email: false, new_password: newPasswordValidation.error, new_password_confirmation: newPasswordConfirmationValidation.error });
+        setFieldErrorMessage({ token: codeValidation.message, email: "", new_password: newPasswordValidation.message, new_password_confirmation: newPasswordConfirmationValidation.message });
 
         return !(codeValidation.error || newPasswordValidation.error || newPasswordConfirmationValidation.error);
 
@@ -93,7 +93,7 @@ export const ForgotPassword = React.memo(() => {
             .catch(function (error) {
 
                 setDisabledForm(true);
-                setServerResponse({ status: true, error: error, message: error.response.data.message });
+                setServerResponse({ status: true, error: true, message: error.response.data.message });
 
                 setTimeout(() => {
                     setServerResponse({ status: false, error: false, message: "" });
@@ -105,16 +105,16 @@ export const ForgotPassword = React.memo(() => {
 
     const updatePasswordServerRequestExecution = (): void => {
 
-        Axios.post('/api/change-password', formDataChangePassword)
+        Axios.post('http://127.0.0.1:8000/api/change-password', formDataChangePassword)
             .then(function (response) {
 
-                setDisabledForm(false);
-                setServerResponse({ status: true, error: false, message: "Success! Your password has been changed!" });
+                setDisabledForm(true);
+                setServerResponse({ status: true, error: false, message: response.data.message });
+                setFormDataChangePassword({ token: "", new_password: "", new_password_confirmation: "" });
 
             })
             .catch(function (error) {
 
-                setDisabledForm(true);
                 setServerResponse({ status: true, error: error, message: error.response.data.message });
 
             })
@@ -147,10 +147,11 @@ export const ForgotPassword = React.memo(() => {
                                 fullWidth
                                 id="email"
                                 label="Email Address"
+                                value={formDataEmail.email}
                                 autoFocus
                                 InputProps={{
                                     endAdornment:
-                                        <IconButton type="submit" form="get_token_form" color='primary'>
+                                        <IconButton type="submit" form="get_token_form" color='primary' disabled={!disabledForm}>
                                             <EmailIcon fontSize="inherit" />
                                         </IconButton>,
                                 }}
@@ -168,12 +169,13 @@ export const ForgotPassword = React.memo(() => {
                             <TextField
                                 required
                                 fullWidth
-                                id="code"
+                                id="token"
                                 label="Code"
-                                name="code"
+                                name="token"
+                                value={formDataChangePassword.token}
                                 disabled={disabledForm}
-                                error={fieldError.code}
-                                helperText={fieldErrorMessage.code}
+                                error={fieldError.token}
+                                helperText={fieldErrorMessage.token}
                                 onChange={handleInputChange}
                             />
                         </Grid>
@@ -185,6 +187,7 @@ export const ForgotPassword = React.memo(() => {
                                 label="New Password"
                                 type="password"
                                 id="new_password"
+                                value={formDataChangePassword.new_password}
                                 disabled={disabledForm}
                                 error={fieldError.new_password}
                                 helperText={fieldErrorMessage.new_password}
@@ -199,6 +202,7 @@ export const ForgotPassword = React.memo(() => {
                                 label="New Password Confirmation"
                                 type="password"
                                 id="new_password_confirmation"
+                                value={formDataChangePassword.new_password_confirmation}
                                 disabled={disabledForm}
                                 error={fieldError.new_password_confirmation}
                                 helperText={fieldErrorMessage.new_password_confirmation}
